@@ -185,12 +185,69 @@ export default function Home() {
         }
       }
       // The useEffect will re-fetch and update userRole state
-      setMessage({ text: `Role set to ${role}.`, type: "info" });
+      setUserRole(role);
     } catch (error) {
       console.error("Error setting role:", error.message);
       setMessage({ text: "Failed to set role. " + error.message, type: "error" });
     }
   }, [supabase, userId]);
+
+  const handleSignInToPreviousAccount = useCallback(async (providedAuthUid) => {
+    if (!supabase) {
+      setMessage({ text: "App not initialized. Please wait.", type: "error" });
+      return;
+    }
+    if (!providedAuthUid) {
+      setMessage({ text: "Please enter an Auth ID.", type: "error" });
+      return;
+    }
+
+    setLoadingApp(true); // Indicate loading
+
+    try {
+        // --- IMPORTANT: This is a HACKY SIMULATION for hackathon purposes. ---
+        // In a real app, directly "logging in" by just providing an auth_uid
+        // requires a custom JWT token generated securely on your backend.
+        // This attempts to find if that user exists in your profiles,
+        // and if so, simulates a "switch" by setting the userId state.
+        // It does NOT truly re-authenticate the Supabase session
+        // if the provided Auth ID doesn't match the current browser's session token.
+
+        // Check if a profile exists for the provided Auth ID
+        const { data: parentCheck, error: parentCheckError } = await supabase
+            .from('parents')
+            .select('auth_uid')
+            .eq('auth_uid', providedAuthUid)
+            .single();
+
+        const { data: childCheck, error: childCheckError } = await supabase
+            .from('children')
+            .select('auth_uid')
+            .eq('auth_uid', providedAuthUid)
+            .single();
+
+        if ((parentCheckError && parentCheckError.code !== 'PGRST116') || (childCheckError && childCheckError.code !== 'PGRST116')) {
+            // Some other error occurred, not just "not found"
+            throw new Error(parentCheckError?.message || childCheckError?.message || "Error checking profile.");
+        }
+
+        if (parentCheck || childCheck) {
+            // If a record exists, we simulate a successful login
+            // By setting the userId, our useEffect will re-fetch and update the UI
+            // However, the underlying Supabase session in localStorage will remain the same.
+            // This is purely for demonstrating a "switch" between known users *in this demo*.
+            setUserId(providedAuthUid); // This triggers the useEffect to load this user's data
+            setMessage({ text: "Switched to previous account ID. (Note: This is a hackathon simulation)", type: "info" });
+        } else {
+            setMessage({ text: "Provided Auth ID not found in records. Please ensure it's correct.", type: "error" });
+            setLoadingApp(false); // Stop loading if not found
+        }
+    } catch (error) {
+        console.error("Error switching account:", error.message);
+        setMessage({ text: "Failed to switch account. " + error.message, type: "error" });
+        setLoadingApp(false);
+    }
+  }, [supabase]);
 
   // Called from OnBoarding when family is created/joined
   const handleFamilyActionComplete = useCallback(async (familyId) => {
@@ -228,7 +285,7 @@ export default function Home() {
 
   // Render based on user's state
   if (!userRole) {
-    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} />;
+    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} handleSignInToPreviousAccount={handleSignInToPreviousAccount} />;
   } else if (!userFamilyId) {
     return <OnBoarding supabase={supabase} userId={userId} userRole={userRole} onFamilyActionComplete={handleFamilyActionComplete} />;
   } else if (userRole === 'parent') {

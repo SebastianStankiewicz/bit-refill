@@ -13,7 +13,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
   const [message, setMessage] = useState(null);
 
   const [selectTab, setSelectTab] = useState("Pending");
-  const [bitRefillAPI, setBitRefillAPI] = useState('');
+  const [bitRefillAPI, setBitRefillAPI] = useState('0dLBdk-jzRxgP7sVOQ-Qvo3ohjiZG0GijHPs3WzXJIw');
 
 
 
