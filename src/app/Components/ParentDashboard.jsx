@@ -193,7 +193,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         ) : selectTab === "Tasks" ? (
           <Tasks supabase={supabase} familyId={familyId} tasks={tasks} />
         ) : selectTab === "Pending" ? (
-          <Pending />
+          <Pending xpRequests={xpRequests} childrenNames={childrenNames} tasks={tasks} handleUpdateXpRequest={handleUpdateXpRequest} />
         ) : null}
 
         {/*Tab bar here */}

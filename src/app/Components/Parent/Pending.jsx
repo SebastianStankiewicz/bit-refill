@@ -1,8 +1,7 @@
 import React, {useState} from 'react'
 
-function Pending() {
+function Pending({xpRequests, childrenNames, tasks, handleUpdateXpRequest}) {
     const [newTaskXp, setNewTaskXp] = useState(10);
-    const [xpRequests, setXpRequests] = useState([]);
   return (
     <div>
         <div className="border p-6 rounded-lg space-y-4 shadow-sm">
