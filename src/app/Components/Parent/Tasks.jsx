@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-function Tasks({ supabase, familyId, tasks }) {
+function Tasks({ supabase, familyId, childrenNames, tasks, setTasks }) {
   const [newTaskDescription, setNewTaskDescription] = useState(""); // Changed from name to description
   const [newTaskXp, setNewTaskXp] = useState(10);
+  const [selectedChildUid, setChildUid] = useState("");
 
   const handleAddTask = async () => {
     if (!newTaskDescription.trim() || newTaskXp <= 0) {
@@ -17,16 +18,25 @@ function Tasks({ supabase, familyId, tasks }) {
         family_id: familyId,
         description: newTaskDescription.trim(),
         xp_value: Number(newTaskXp),
+        assigned_child_id: selectedChildUid
       });
 
       if (error) throw error;
 
+      setTasks((prev) => [
+        ...prev,
+        {
+          id: Date.now(), // Temp ID
+          family_id: familyId,
+          description: newTaskDescription.trim(),
+          xp_value: Number(newTaskXp),
+        },
+      ]);
+
       setNewTaskDescription("");
       setNewTaskXp(10);
-
     } catch (error) {
       console.error("Error adding task:", error.message);
-
     }
   };
 
@@ -34,6 +44,7 @@ function Tasks({ supabase, familyId, tasks }) {
     <div>
       <div className="border p-6 rounded-lg space-y-4 shadow-sm">
         <h2 className="text-2xl font-semibold text-gray-800">Add New Task</h2>
+        <div></div>
         <input
           type="text"
           placeholder="Task Description (e.g., Do the dishes)"
@@ -41,13 +52,18 @@ function Tasks({ supabase, familyId, tasks }) {
           onChange={(e) => setNewTaskDescription(e.target.value)}
           className="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
         />
-        <input
-          type="text"
-          placeholder="Child (select from drop down"
-          value={newTaskDescription}
-          onChange={(e) => setNewTaskDescription(e.target.value)}
+        <select
+          value={selectedChildUid}
+          onChange={(e) => setChildUid(e.target.value)}
           className="w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-        />
+        >
+          <option value="">Select a child</option>
+          {childrenNames.map((child) => (
+            <option key={child.id} value={child.id} >
+              {child.name}
+            </option>
+          ))}
+        </select>
         <input
           type="number"
           placeholder="XP Value"

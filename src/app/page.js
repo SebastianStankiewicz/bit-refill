@@ -148,6 +148,8 @@ export default function Home() {
 
   // Called from RoleSelection when user picks 'parent' or 'child'
   const handleSelectRole = useCallback(async (role) => {
+    setUserRole(role);
+    /*
     if (!supabase || !userId) return;
     try {
       if (role === 'parent') {
@@ -190,6 +192,7 @@ export default function Home() {
       console.error("Error setting role:", error.message);
       setMessage({ text: "Failed to set role. " + error.message, type: "error" });
     }
+    */
   }, [supabase, userId]);
 
   const handleSignInToPreviousAccount = useCallback(async (providedAuthUid) => {
@@ -285,9 +288,9 @@ export default function Home() {
 
   // Render based on user's state
   if (!userRole) {
-    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} handleSignInToPreviousAccount={handleSignInToPreviousAccount} />;
+    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} handleSignInToPreviousAccount={handleSignInToPreviousAccount} setUserId={setUserId} />;
   } else if (!userFamilyId) {
-    return <OnBoarding supabase={supabase} userId={userId} userRole={userRole} onFamilyActionComplete={handleFamilyActionComplete} />;
+    return <OnBoarding supabase={supabase} userId={userId} userRole={userRole} onFamilyActionComplete={handleFamilyActionComplete} setUserId={setUserId} />;
   } else if (userRole === 'parent') {
     return <ParentDashboard supabase={supabase} userId={userId} familyId={userFamilyId} onSignOut={handleSignOut} />;
   } else if (userRole === 'child') {

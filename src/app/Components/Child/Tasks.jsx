@@ -10,6 +10,7 @@ function Tasks({supabase, familyId, tasks, pendingRequests, handleRequestXp}) {
       <ul className="space-y-3">
         {tasks.map(task => {
           const isPending = pendingRequests.some(req => req.task_id === task.id);
+          console.log("Task: " + task);
           return (
             <li key={task.id} className="p-3 bg-gray-50 rounded-md border flex justify-between items-center">
               <div>

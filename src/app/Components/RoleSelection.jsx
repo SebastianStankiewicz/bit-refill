@@ -5,6 +5,7 @@ function RoleSelection({
   userId,
   onSelectRole,
   handleSignInToPreviousAccount,
+  setUserId
 }) {
   const [showSignInWindow, setShowSignInWindow] = useState(false);
   const [userIdToLogin, setUserIdToLogin] = useState("fdc57b21-8b32-4364-8dba-ea545be8fe42");
@@ -33,11 +34,13 @@ function RoleSelection({
 
           <div className="flex justify-center space-x-6">
             <button
+             onClick={() => onSelectRole('child')}
               className="px-8 py-4 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors text-xl font-semibold"
             >
               A Child
             </button>
             <button
+             onClick={() => onSelectRole('parent')}
               className="px-8 py-4 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition-colors text-xl font-semibold"
             >
               A Parent

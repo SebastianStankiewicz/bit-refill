@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import MessageBox from './MessageBox'; // Import MessageBox
 
-function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete }) {
+function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUserId }) {
+  const [childName, setChildName] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [familyCodeInput, setFamilyCodeInput] = useState('');
   const [bitRefillAPI, setBitRefillAPI] = useState('');
@@ -108,7 +109,7 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete }) {
       } else {
         const { data: newChild, error: insertChildError } = await supabase
           .from('children')
-          .insert({ auth_uid: userId, name: "Child " + userId.substring(0, 6) }) // Placeholder name
+          .insert({ auth_uid: userId, name: childName }) // Placeholder name
           .select('id')
           .single();
         if (insertChildError) throw insertChildError;
@@ -138,8 +139,14 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete }) {
         {userRole === "child" && (
           <div className="space-y-6">
             <h1 className="text-3xl font-bold text-gray-800">Join Family</h1>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={childName}
+              onChange={(e) => setChildName(e.target.value)}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg text-center"
+            />
             <p className="text-lg text-gray-600">Enter your family's unique code.</p>
-
             <input
               type="text"
               placeholder="Family Code"

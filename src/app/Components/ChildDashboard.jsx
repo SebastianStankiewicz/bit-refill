@@ -28,6 +28,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         setFamily(data);
       }
     };
+
+    const fetchTasks = async () => {
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .eq("family_id", familyId)
+        .eq("assigned_child_id", childId);;
+      if (error) console.error("Error fetching tasks:", error.message);
+      else setTasks(data || []);
+    };
+
+    fetchTasks();
     fetchFamily();
 
     // Realtime listener for tasks
@@ -47,15 +59,8 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
       )
       .subscribe();
 
-    const fetchTasks = async () => {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("family_id", familyId);
-      if (error) console.error("Error fetching tasks:", error.message);
-      else setTasks(data || []);
-    };
-    fetchTasks();
+
+
 
     // Realtime listener for child's profile for XP balance
     const profileChannel = supabase
@@ -147,6 +152,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
       });
 
       if (error) throw error;
+      setPendingRequests((prev) => [
+        ...prev,
+        {
+          id: Date.now(), // Temporary ID (can be replaced by real one later)
+          task_id: task.id,
+          child_auth_uid: userId,
+          requested_xp: task.xp_value,
+          status: "pending",
+          family_id: familyId,
+        },
+      ]);
+      
       setMessage({
         text: `XP request for "${task.description}" submitted!`,
         type: "info",

@@ -15,6 +15,8 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
   const [selectTab, setSelectTab] = useState("Pending");
   const [bitRefillAPI, setBitRefillAPI] = useState('0dLBdk-jzRxgP7sVOQ-Qvo3ohjiZG0GijHPs3WzXJIw');
 
+  const [children, setChildren] = useState([]);
+
 
 
   useEffect(() => {
@@ -34,7 +36,47 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         setFamily(data);
       }
     };
+
+    const fetchChildren = async () => {
+      const { data, error } = await supabase
+        .from("children")
+        .select("*")
+        .eq("family_id", familyId);
+  
+      if (error) {
+        console.error("Error fetching children:", error.message);
+      } else {
+        setChildren(data || []);
+      }
+    };
+    
+
+    const fetchTasks = async () => {
+      const { data, error } = await supabase
+        .from("tasks")
+        .select(`
+          *,
+          xp_requests(status)
+        `)
+        .eq("family_id", familyId);
+    
+      if (error) {
+        console.error("Error fetching tasks:", error.message);
+        return;
+      }
+    
+      // Filter out tasks with an approved XP request
+      const filteredTasks = (data || []).filter((task) => {
+        // If no xp_requests or none are approved, keep the task
+        const requests = task.xp_requests || [];
+        return !requests.some((req) => req.status === "approved");
+      });
+    
+      setTasks(filteredTasks);
+    };
     fetchFamily();
+    fetchTasks();
+    fetchChildren();
 
     // Realtime listener for tasks
     const tasksChannel = supabase
@@ -53,15 +95,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
       )
       .subscribe();
 
-    const fetchTasks = async () => {
-      const { data, error } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("family_id", familyId);
-      if (error) console.error("Error fetching tasks:", error.message);
-      else setTasks(data || []);
-    };
-    fetchTasks();
+    
 
     // Realtime listener for XP requests
     const xpRequestsChannel = supabase
@@ -154,8 +188,9 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
           .eq("auth_uid", childAuthUid); // Update by auth_uid
 
         if (xpUpdateError) throw xpUpdateError;
+      
       }
-      setMessage({ text: `XP request ${status}!`, type: "info" });
+      setXpRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (error) {
       console.error("Error updating XP request:", error.message);
       setMessage({
@@ -191,7 +226,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         {selectTab === "Store" ? (
           <Store apiKey={bitRefillAPI} />
         ) : selectTab === "Tasks" ? (
-          <Tasks supabase={supabase} familyId={familyId} tasks={tasks} />
+          <Tasks supabase={supabase} familyId={familyId} childrenNames={children} tasks={tasks} setTasks={setTasks} />
         ) : selectTab === "Pending" ? (
           <Pending xpRequests={xpRequests} childrenNames={childrenNames} tasks={tasks} handleUpdateXpRequest={handleUpdateXpRequest} />
         ) : null}
