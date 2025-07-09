@@ -4,6 +4,7 @@ import MessageBox from './MessageBox'; // Import MessageBox
 function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete }) {
   const [familyName, setFamilyName] = useState('');
   const [familyCodeInput, setFamilyCodeInput] = useState('');
+  const [bitRefillAPI, setBitRefillAPI] = useState('');
   const [generatedFamilyCode, setGeneratedFamilyCode] = useState('');
   const [message, setMessage] = useState(null); // For MessageBox
 
@@ -159,8 +160,16 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete }) {
         {userRole === "parent" && (
           <div className="space-y-6">
             <h1 className="text-3xl font-bold text-gray-800">Create Family</h1>
+            
+            <p className="text-lg text-gray-600">Enter your Bitrefill API key. Secure icon here </p>
+            <input
+              type="text"
+              placeholder="Bitrefill API key"
+              value={bitRefillAPI}
+              onChange={(e) => setBitRefillAPI(e.target.value)}
+              className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg text-center"
+            />
             <p className="text-lg text-gray-600">Enter a name for your family.</p>
-
             <input
               type="text"
               placeholder="Family Name"
