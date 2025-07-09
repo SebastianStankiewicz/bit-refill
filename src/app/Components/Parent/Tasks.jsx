@@ -18,7 +18,7 @@ function Tasks({ supabase, familyId, childrenNames, tasks, setTasks }) {
         family_id: familyId,
         description: newTaskDescription.trim(),
         xp_value: Number(newTaskXp),
-        assigned_child_id: selectedChildUid
+        assigned_child_uid: selectedChildUid
       });
 
       if (error) throw error;
@@ -59,7 +59,7 @@ function Tasks({ supabase, familyId, childrenNames, tasks, setTasks }) {
         >
           <option value="">Select a child</option>
           {childrenNames.map((child) => (
-            <option key={child.id} value={child.id} >
+            <option key={child.id} value={child.auth_uid} >
               {child.name}
             </option>
           ))}

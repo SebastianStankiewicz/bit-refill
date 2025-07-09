@@ -29,17 +29,17 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
       }
     };
 
-    const fetchTasks = async () => {
+    const fetchTasks = async (userId) => {
       const { data, error } = await supabase
         .from("tasks")
         .select("*")
         .eq("family_id", familyId)
-        .eq("assigned_child_id", childId);;
+        .eq("assigned_child_uid", userId);;
       if (error) console.error("Error fetching tasks:", error.message);
       else setTasks(data || []);
     };
 
-    fetchTasks();
+    fetchTasks(userId);
     fetchFamily();
 
     // Realtime listener for tasks
