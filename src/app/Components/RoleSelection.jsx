@@ -35,9 +35,6 @@ function RoleSelection({
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
               FamFill
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 font-medium leading-relaxed px-2">
-              Family XP management made simple.
-            </p>
             <div className="flex justify-center">
               <div className="w-20 sm:w-24 h-1 bg-gradient-to-r from-[#002B28] to-[#004540] rounded-full"></div>
             </div>
