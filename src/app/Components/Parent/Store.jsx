@@ -122,76 +122,76 @@ function Store({ supabase, apiKey, familyId }) {
   }, [apiKey]);
 
   return (
-    <div className="w-full h-full bg-gradient-to-br from-gray-50 to-white">
-      <div className="max-w-6xl mx-auto p-6 space-y-8">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          <div className="text-center space-y-6">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
-                Gift Card Store
-              </h1>
-              <p className="text-gray-600">Powered by Bitrefill</p>
-            </div>
-            
-            {/* Balance Card */}
-            <div className="inline-flex items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl px-6 py-4">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                </svg>
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-medium text-green-700">Current Balance</p>
-                <p className="text-xl font-bold text-green-800">
-                  {loadingBalance
-                    ? "Loading..."
-                    : balance !== null
-                    ? `£${balance}`
-                    : "Unavailable"}
-                </p>
-              </div>
-            </div>
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 to-white py-4 sm:py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
+      {/* Header Section */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
+        <div className="text-center space-y-4 sm:space-y-6">
+          <div className="space-y-1 sm:space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
+              Gift Card Store
+            </h1>
+            <p className="text-gray-600 text-sm sm:text-base">Powered by Bitrefill</p>
           </div>
-        </div>
-
-        {/* Products Section */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-[#002B28] rounded-lg">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800">Manage Products</h2>
-                <p className="text-gray-600">Configure available gift cards</p>
-              </div>
+          
+          {/* Balance Card */}
+          <div className="inline-flex flex-col sm:flex-row items-center gap-3 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl px-4 py-3 sm:px-6 sm:py-4">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+              </svg>
             </div>
-          </div>
-
-          {/* Products Grid */}
-          <div className="space-y-4">
-            {products.length > 0 ? (
-              products.map((product, i) => (
-                <ProductCard key={i} product={product} />
-              ))
-            ) : (
-              <div className="text-center py-12">
-                <div className="p-4 bg-gray-100 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No products available</h3>
-                <p className="text-gray-500">Add some gift cards to get started</p>
-              </div>
-            )}
+            <div className="text-center sm:text-left">
+              <p className="text-xs sm:text-sm font-medium text-green-700">Current Balance</p>
+              <p className="text-lg sm:text-xl font-bold text-green-800">
+                {loadingBalance
+                  ? "Loading..."
+                  : balance !== null
+                  ? `£${balance}`
+                  : "Unavailable"}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Products Section */}
+      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6">
+          <div className="flex items-center gap-3 mb-4 sm:mb-0">
+            <div className="p-2 bg-[#002B28] rounded-lg flex-shrink-0">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Manage Products</h2>
+              <p className="text-gray-600 text-sm sm:text-base">Configure available gift cards</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Products Grid */}
+        <div className="space-y-4">
+          {products.length > 0 ? (
+            products.map((product, i) => (
+              <ProductCard key={i} product={product} />
+            ))
+          ) : (
+            <div className="text-center py-8 sm:py-12">
+              <div className="p-3 sm:p-4 bg-gray-100 rounded-full w-14 h-14 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+                <svg className="w-7 h-7 sm:w-8 sm:h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-1 sm:mb-2">No products available</h3>
+              <p className="text-gray-500 text-sm">Add some gift cards to get started</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
+  </div>
   );
 }
 
