@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
         name="fc:miniapp"
         content='{
           "version": "1",
-          "imageUrl": "https://media.discordapp.net/attachments/535551463187808309/1392905256337276949/image.png?ex=68713b9c&is=686fea1c&hm=93849b99ac66f89ccc5ba16f1a2791ba0b85d9f3274bcdf622d7d56285024378&=&format=webp&quality=lossless&width=1652&height=1652",
+          "imageUrl": "https://media.discordapp.net/attachments/535551463187808309/1392906503333216359/image.png?ex=68713cc5&is=686feb45&hm=9bc3d20d3ba70fa34d8904d92f8d0edf0417e90128447cb3a215d8f4ac573a5b&=&format=webp&quality=lossless&width=1640&height=1092",
           "button": {
             "title": "Launch FamFi",
             "action": {
