@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@farcaster/miniapp-sdk": "^0.1.6",
     "@supabase/supabase-js": "^2.50.3",
     "daisyui": "^5.0.43",
     "lucide-react": "^0.525.0",

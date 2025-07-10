@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { sdk } from '@farcaster/miniapp-sdk'
 
 // Import your separated components
 import MessageBox from './Components/MessageBox';
@@ -21,6 +22,19 @@ export default function Home() {
 
   // --- Supabase Initialization and Auth Listener ---
   useEffect(() => {
+
+    const init = async () => {
+      try {
+        await sdk.actions.ready(); // Wait for SDK to be ready
+        console.log("Farcaster SDK is ready!");
+        // You can now call other SDK methods here
+      } catch (error) {
+        console.error("SDK ready error:", error);
+      }
+    };
+
+    init();
+    
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -30,6 +44,8 @@ export default function Home() {
       setLoadingApp(false);
       return;
     }
+
+    
 
     const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
     setSupabase(supabaseClient);
@@ -279,12 +295,15 @@ export default function Home() {
 
   // --- Conditional Rendering Logic ---
   if (loadingApp) {
+    
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <p className="text-xl text-gray-700">Loading application...</p>
       </div>
     );
   }
+
+  
 
   // Render based on user's state
   if (!userRole) {
