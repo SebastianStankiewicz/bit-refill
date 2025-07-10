@@ -293,14 +293,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
                   {family.family_code}
                 </p>
               </div>
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-xs font-medium text-gray-700 mb-1">
-                  User ID
-                </p>
-                <p className="font-mono text-xs text-gray-600 truncate">
-                  {userId.substring(0, 8)}...
-                </p>
-              </div>
+        
             </div>
             <button
               onClick={onSignOut}
