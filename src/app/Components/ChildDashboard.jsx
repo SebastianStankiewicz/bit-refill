@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import MessageBox from "./MessageBox"; // Import MessageBox
+import Image from "next/image";
+import MessageBox from "./MessageBox";
 import Tasks from "./Child/Tasks";
 import Store from "./Child/Store";
 function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
@@ -9,7 +10,8 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
   const [message, setMessage] = useState(null);
   const [pendingRequests, setPendingRequests] = useState([]); // To show child their pending requests
 
-  const [selectTab, setSelectTab] = useState("Pending");
+  const [selectTab, setSelectTab] = useState("Tasks");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!supabase || !familyId) return;
@@ -235,46 +237,203 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center p-8 bg-gray-50 font-sans w-full">
-      <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-2xl space-y-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Child Dashboard: {family.family_name}
-        </h1>
-        <p className="text-lg text-gray-600">
-          Your XP Balance:{" "}
-          <span className="font-extrabold text-purple-700">{xpBalance} XP</span>
-        </p>
-        <p className="text-sm text-gray-500">
-          Your User ID:{" "}
-          <span className="font-mono text-gray-700 break-all">{userId}</span>
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white shadow-sm border-b border-gray-200">
+        <div className="flex items-center justify-between p-4">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <Image
+              src="/bitrefill-logo.svg"
+              alt="Bitrefill Logo"
+              width={120}
+              height={36}
+              className="h-6 w-auto"
+            />
+          </div>
+          <div className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-indigo-100 px-3 py-1 rounded-full">
+            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <span className="text-sm font-bold text-purple-700">{xpBalance} XP</span>
+          </div>
+        </div>
+        
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="border-t border-gray-200 bg-white p-4 space-y-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-lg font-bold text-gray-800">{family?.family_name}</h2>
+              <p className="text-sm text-gray-600">Child Dashboard</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-gray-500">User ID: {userId.slice(0, 8)}...</p>
+            </div>
+          </div>
+        )}
+      </div>
 
-        {selectTab === "Store" ? (
-          <Store handleSpendXp={null} />
-        ) : selectTab === "Tasks" ? (
-          <Tasks supabase={supabase} familyId={familyId} tasks={tasks} pendingRequests={pendingRequests} handleRequestXp={handleRequestXp} />
-        ) : null}
+      <div className="flex">
+        {/* Desktop Sidebar */}
+        <div className="hidden lg:flex lg:w-80 bg-white shadow-lg border-r border-gray-200">
+          <div className="w-full p-6 space-y-6">
+            {/* Header Section */}
+            <div className="text-center space-y-4">
+              <div className="flex justify-center">
+                <Image
+                  src="/bitrefill-logo.svg"
+                  alt="Bitrefill Logo"
+                  width={150}
+                  height={45}
+                  className="h-8 w-auto"
+                />
+              </div>
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
+                  {family?.family_name || "Loading..."}
+                </h1>
+                <p className="text-sm text-gray-600">Child Dashboard</p>
+              </div>
+            </div>
 
-        <div className="flex flex-row justify-around border-b border-gray-200 mb-6 bg-gray-50 rounded-t-lg shadow-inner">
+            {/* XP Balance Card */}
+            <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-purple-700">Your XP Balance</p>
+                  <p className="text-xl font-bold text-purple-800">{xpBalance} XP</p>
+                </div>
+              </div>
+            </div>
+
+            {/* User Info */}
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs text-gray-500 mb-1">User ID</p>
+              <p className="text-sm font-mono text-gray-700 break-all">{userId}</p>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="space-y-2">
+              <button
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  selectTab === "Tasks"
+                    ? "bg-[#002B28] text-white shadow-md"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                }`}
+                onClick={() => setSelectTab("Tasks")}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <span>Tasks</span>
+                <span className="ml-auto bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
+                  {tasks.length}
+                </span>
+              </button>
+              <button
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                  selectTab === "Store"
+                    ? "bg-[#002B28] text-white shadow-md"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+                }`}
+                onClick={() => setSelectTab("Store")}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span>Shop</span>
+              </button>
+            </div>
+
+            {/* Sign Out Button */}
+            <div className="pt-4 border-t border-gray-200">
+              <button
+                onClick={onSignOut}
+                className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                <span>Sign Out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 p-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Message Display */}
+            {message && (
+              <div className="mb-6">
+                <MessageBox message={message} onClose={() => setMessage(null)} />
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+              {selectTab === "Tasks" && (
+                <Tasks 
+                  supabase={supabase} 
+                  familyId={familyId} 
+                  tasks={tasks} 
+                  pendingRequests={pendingRequests} 
+                  handleRequestXp={handleRequestXp} 
+                />
+              )}
+              {selectTab === "Store" && (
+                <Store handleSpendXp={handleSpendXp} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
+        <div className="flex">
           <button
-            className={`flex-1 py-3 text-lg font-semibold transition-colors duration-200 ${
+            className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors duration-200 ${
               selectTab === "Tasks"
-                ? "text-blue-700 border-b-2 border-blue-700 bg-white shadow-sm"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                ? "text-[#002B28] bg-green-50"
+                : "text-gray-600"
             }`}
             onClick={() => setSelectTab("Tasks")}
           >
-            Tasks ({tasks.length})
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span className="text-xs font-medium">Tasks</span>
+            {tasks.length > 0 && (
+              <span className="absolute -top-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {tasks.length}
+              </span>
+            )}
           </button>
           <button
-            className={`flex-1 py-3 text-lg font-semibold rounded-tr-lg transition-colors duration-200 ${
+            className={`flex-1 flex flex-col items-center gap-1 py-3 transition-colors duration-200 ${
               selectTab === "Store"
-                ? "text-blue-700 border-b-2 border-blue-700 bg-white shadow-sm"
-                : "text-gray-600 hover:text-gray-800 hover:bg-gray-100"
+                ? "text-[#002B28] bg-green-50"
+                : "text-gray-600"
             }`}
             onClick={() => setSelectTab("Store")}
           >
-            Shop
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            </svg>
+            <span className="text-xs font-medium">Shop</span>
           </button>
         </div>
       </div>

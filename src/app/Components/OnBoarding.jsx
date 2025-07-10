@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import MessageBox from './MessageBox'; // Import MessageBox
 
 function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUserId }) {
@@ -138,6 +139,15 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUse
       <div className="bg-white p-10 rounded-xl shadow-lg w-full max-w-md text-center space-y-8">
         {userRole === "child" && (
           <div className="space-y-6">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/bitrefill-logo.svg"
+                alt="Bitrefill Logo"
+                width={180}
+                height={54}
+                className="h-10 w-auto"
+              />
+            </div>
             <h1 className="text-3xl font-bold text-gray-800">Join Family</h1>
             <input
               type="text"
@@ -157,7 +167,7 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUse
 
             <button
               onClick={handleJoinFamily}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition-colors text-xl font-semibold"
+              className="w-full px-6 py-3 bg-[#002B28] text-white rounded-lg shadow-md hover:bg-[#004540] transition-colors text-xl font-semibold"
             >
               Continue
             </button>
@@ -166,6 +176,15 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUse
 
         {userRole === "parent" && (
           <div className="space-y-6">
+            <div className="flex justify-center mb-4">
+              <Image
+                src="/Bitrefill Brand Kit/Logo/SVG/01-LOGOTYPE-BITREFILL-GREEN-RGB.svg"
+                alt="Bitrefill Logo"
+                width={180}
+                height={54}
+                className="h-10 w-auto"
+              />
+            </div>
             <h1 className="text-3xl font-bold text-gray-800">Create Family</h1>
             
             <p className="text-lg text-gray-600">Enter your Bitrefill API key. Secure icon here </p>
@@ -187,7 +206,7 @@ function OnBoarding({ supabase, userId, userRole, onFamilyActionComplete, setUse
 
             <button
               onClick={handleCreateFamily}
-              className="w-full px-6 py-3 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 transition-colors text-xl font-semibold"
+              className="w-full px-6 py-3 bg-[#002B28] text-white rounded-lg shadow-md hover:bg-[#004540] transition-colors text-xl font-semibold"
             >
               Create Family
             </button>
