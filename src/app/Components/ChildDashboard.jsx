@@ -61,8 +61,6 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
       setTasks(filteredTasks);
     };
 
-    
-
     fetchTasks(userId);
     fetchFamily();
 
@@ -192,7 +190,7 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
   const handleSpendXp = async (giftCardID) => {
     try {
       if (!userId || !familyId) throw new Error("Missing user or family info");
-  
+
       // 1. Get the selected gift card
       const { data: giftCard, error: giftCardError } = await supabase
         .from("family_gift_cards")
@@ -200,10 +198,10 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         .eq("id", giftCardID)
         .eq("family_id", familyId)
         .single();
-  
+
       if (giftCardError) throw giftCardError;
       if (!giftCard) throw new Error("Gift card not found");
-  
+
       // 2. Get the child's XP balance
       const { data: child, error: childError } = await supabase
         .from("children")
@@ -211,14 +209,13 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         .eq("auth_uid", userId)
         .eq("family_id", familyId)
         .single();
-  
+
       if (childError) throw childError;
       if (!child) throw new Error("Child not found");
-  
+
       // 3. Compare XP and proceed or block
       if (child.xp_balance < giftCard.xp_cost) {
         console.warn("Not enough XP to purchase this gift card.");
-        alert("You don’t have enough XP!");
         return;
       }
 
@@ -230,41 +227,58 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         .from("children")
         .update({ xp_balance: newXpBalance })
         .eq("auth_uid", userId);
-  
+
       if (updateError) throw updateError;
-  
+
       // 4. Placeholder for actual purchase logic
       console.log(
         `Proceeding with purchase of "${giftCard.product_name}" for ${giftCard.xp_cost} XP.`
       );
 
-      
       try {
         const res = await fetch(
-          `/api/bitrefill/purchase-test/?apiKey=${encodeURIComponent(bitRefillAPI)}`
+          `/api/bitrefill/purchase-test/?apiKey=${encodeURIComponent(
+            bitRefillAPI
+          )}`
         );
-    
+
         if (!res.ok) {
           const errorData = await res.json();
           console.error("Test card purchase failed:", errorData);
           return;
         }
-    
+
         const data = await res.json();
         console.log("Test Purchase:", data);
+
+        const orderDATA = data.data;
+        const orderMETA = data.meta;
+
+        const { error: insertError } = await supabase
+          .from("purchased_gift_cards")
+          .insert({
+            child_auth_uid: userId,
+            family_id: familyId,
+            gift_card_product_id: giftCardID,
+            xp_cost_at_purchase: giftCard.xp_cost,
+            bitrefill_order_id: orderDATA.id,
+            status: orderDATA.status || "pending_delivery",
+          });
+
+        if (insertError) {
+          console.error("Failed to insert purchased gift card:", insertError);
+          return;
+        }
+        console.log("Add an animation here!!");
       } catch (err) {
         console.error("Unexpected error during test card purchase:", err);
       }
-      
-  
+
       // Future: Deduct XP, insert into `purchased_gift_cards`, call Bitrefill, etc.
-  
     } catch (err) {
       console.error("Error in handleSpendXp:", err.message);
     }
   };
-  
-
 
   if (!family) {
     return (
@@ -506,7 +520,15 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
                   handleRequestXp={handleRequestXp}
                 />
               )}
-              {selectTab === "Store" && <Store supabase={supabase} handleSpendXp={handleSpendXp} familyId={familyId} apiKey={bitRefillAPI} />}
+              {selectTab === "Store" && (
+                <Store
+                  supabase={supabase}
+                  handleSpendXp={handleSpendXp}
+                  familyId={familyId}
+                  apiKey={bitRefillAPI}
+                  userId={userId}
+                />
+              )}
             </div>
           </div>
         </div>

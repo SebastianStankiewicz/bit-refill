@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 
-function Store({ supabase, handleSpendXp, familyId, apiKey }) {
+function Store({ supabase, handleSpendXp, familyId, apiKey, userId }) {
   const [products, setProducts] = useState([]);
   const [orderHistory, setOrderHistory] = useState([]);
 
@@ -35,23 +35,49 @@ function Store({ supabase, handleSpendXp, familyId, apiKey }) {
 
     const fetchOrderHistory = async () => {
       try {
+        if (!userId) throw new Error("Missing userId");
+    
+        // Step 1: Fetch Bitrefill orders
         const res = await fetch(
           `/api/bitrefill/orders/?apiKey=${encodeURIComponent(apiKey)}`
         );
-
+    
         if (!res.ok) {
           const errorData = await res.json();
           console.error("Failed to fetch orders", errorData);
           return;
         }
+    
+        const { data: bitrefillOrders } = await res.json(); // this is an array
 
-        const data = await res.json();
-        setOrderHistory(data);
-        console.log("Orders:", data);
+        // Step 2: Get user's purchased gift cards from Supabase
+        const { data: userPurchases, error: purchaseError } = await supabase
+          .from("purchased_gift_cards")
+          .select("bitrefill_order_id")
+          .eq("child_auth_uid", userId);
+    
+        if (purchaseError) {
+          console.error("Failed to fetch user's purchased gift cards:", purchaseError);
+          return;
+        }
+    
+        const allowedOrderIDs = userPurchases.map((purchase) => purchase.bitrefill_order_id);
+        
+        // Step 3: Filter Bitrefill orders to those matching the user's purchases
+        const filteredOrders = bitrefillOrders.filter((order) =>
+          allowedOrderIDs.includes(order.invoice.id)
+        );
+
+        console.log(bitrefillOrders);
+    
+        // Step 4: Save filtered results to state
+        setOrderHistory(filteredOrders);
+        console.log("Filtered Orders:", filteredOrders);
       } catch (err) {
-        console.error("Unexpected error during test card purchase:", err);
+        console.error("Unexpected error during order history fetch:", err);
       }
     };
+    
 
     fetchFamilyGiftCards();
     fetchOrderHistory();
@@ -161,8 +187,8 @@ function Store({ supabase, handleSpendXp, familyId, apiKey }) {
           </div>
 
           <div className="space-y-3">
-            {orderHistory?.data?.length > 0 ? (
-              orderHistory.data.map((order) => (
+            {orderHistory?.length > 0 ? (
+              orderHistory.map((order) => (
                 <div
                   key={order.id}
                   className="bg-white rounded-xl p-4 border border-gray-200"
