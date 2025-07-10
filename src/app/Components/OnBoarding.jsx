@@ -64,7 +64,7 @@ function OnBoarding({
           family_name: familyName.trim(),
           family_code: familyCode,
           parent_auth_uid: userId, // Store parent's auth_uid here
-          bitrefill_api_key: bitRefillAPI.trim()
+          bitrefill_api_key: bitRefillAPI.trim(),
         })
         .select("id") // Select the inserted row to get its ID
         .single();
@@ -81,7 +81,8 @@ function OnBoarding({
           product_name: "Test",
           value_in_currency: 0,
           currency: "USD",
-          image_url: "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
+          image_url:
+            "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
           is_active: true,
           bitrefill_product_id: "test-gift-card-code",
           xp_cost: 100,
@@ -226,7 +227,7 @@ function OnBoarding({
           <div className="space-y-6">
             <div className="flex justify-center mb-4">
               <Image
-                src="/Bitrefill Brand Kit/Logo/SVG/01-LOGOTYPE-BITREFILL-GREEN-RGB.svg"
+                src="/bitrefill-logo.svg"
                 alt="Bitrefill Logo"
                 width={180}
                 height={54}

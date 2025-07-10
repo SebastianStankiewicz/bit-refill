@@ -13,14 +13,6 @@ function Store({ supabase, apiKey, familyId }) {
 
   const [products, setProducts] = useState([
     {
-      name: "Test Gift Card",
-      usdValue: 0,
-      xpValue: 200,
-      enabled: true,
-      imgURL:
-        "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
-    },
-    {
       name: "Roblox",
       usdValue: 5,
       xpValue: 100,
@@ -81,7 +73,7 @@ function Store({ supabase, apiKey, familyId }) {
             "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
         }));
     
-        setProducts(mappedProducts);
+        setProducts(prev => [...prev, ...mappedProducts]);
       } catch (err) {
         console.error("Error fetching family gift cards:", err.message);
       }
