@@ -31,9 +31,9 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setFarcasterUserData(data);
-        alert("Succes login")
+        setUserId(data.fid);
       } else{
-        alert("failed to login")
+        console.log("failed to use farcaster idk why");
       }
 
       await sdk.actions.ready();
@@ -55,6 +55,8 @@ export default function Home() {
     setSupabase(supabaseClient);
 
     // Supabase Auth State Change Listener
+    
+    /*
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(async (event, session) => {
       if (session && session.user) {
         setUserId(session.user.id);
@@ -77,6 +79,9 @@ export default function Home() {
     return () => {
       if (authListener) authListener.unsubscribe(); // Cleanup auth listener
     };
+
+    */
+
   }, []); // Run only once on component mount
 
   // --- Fetch User Role and Family ID based on userId (auth.uid()) ---
