@@ -18,7 +18,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
 
   //Has been pushed to git so will change after testing and remove hard coding
   const [bitRefillAPI, setBitRefillAPI] = useState(
-    ""
+    "zerAK5-I3eFm_FH5dV1N2awVsJBgLXNR1O9Ge8qfl4U"
   );
 
   const [children, setChildren] = useState([]);
@@ -399,7 +399,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         <div className="flex-1 p-4 lg:p-8">
           <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6 min-h-full">
             {selectTab === "Store" ? (
-              <Store apiKey={bitRefillAPI} />
+              <Store supabase={supabase} apiKey={bitRefillAPI} familyId={familyId} />
             ) : selectTab === "Tasks" ? (
               <Tasks
                 supabase={supabase}

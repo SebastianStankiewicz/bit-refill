@@ -13,6 +13,10 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
   const [selectTab, setSelectTab] = useState("Tasks");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const [bitRefillAPI, setBitRefillAPI] = useState(
+    "zerAK5-I3eFm_FH5dV1N2awVsJBgLXNR1O9Ge8qfl4U"
+  );
+
   useEffect(() => {
     if (!supabase || !familyId) return;
 
@@ -42,20 +46,21 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         )
         .eq("family_id", familyId)
         .eq("assigned_child_uid", userId); // Only tasks for the current user
-    
+
       if (error) {
         console.error("Error fetching tasks:", error.message);
         return;
       }
-    
+
       // Filter out tasks with an approved XP request
       const filteredTasks = (data || []).filter((task) => {
         const requests = task.xp_requests || [];
         return !requests.some((req) => req.status === "approved");
       });
-    
+
       setTasks(filteredTasks);
     };
+
     
 
     fetchTasks(userId);
@@ -77,9 +82,6 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         }
       )
       .subscribe();
-
-
-
 
     // Realtime listener for child's profile for XP balance
     const profileChannel = supabase
@@ -106,7 +108,7 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         .select("xp_balance")
         .eq("auth_uid", userId)
         .single();
-      if (error) console.error("Error fetching profile:", error.message);
+      if (error) console.error("Error fetching profile: USER ID CHECK", userId);
       else setXpBalance(data ? data.xp_balance || 0 : 0);
     };
     fetchProfile();
@@ -182,12 +184,87 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
           family_id: familyId,
         },
       ]);
-     
     } catch (error) {
       console.error("Error requesting XP:", error.message);
-      
     }
   };
+
+  const handleSpendXp = async (giftCardID) => {
+    try {
+      if (!userId || !familyId) throw new Error("Missing user or family info");
+  
+      // 1. Get the selected gift card
+      const { data: giftCard, error: giftCardError } = await supabase
+        .from("family_gift_cards")
+        .select("xp_cost, product_name")
+        .eq("id", giftCardID)
+        .eq("family_id", familyId)
+        .single();
+  
+      if (giftCardError) throw giftCardError;
+      if (!giftCard) throw new Error("Gift card not found");
+  
+      // 2. Get the child's XP balance
+      const { data: child, error: childError } = await supabase
+        .from("children")
+        .select("xp_balance")
+        .eq("auth_uid", userId)
+        .eq("family_id", familyId)
+        .single();
+  
+      if (childError) throw childError;
+      if (!child) throw new Error("Child not found");
+  
+      // 3. Compare XP and proceed or block
+      if (child.xp_balance < giftCard.xp_cost) {
+        console.warn("Not enough XP to purchase this gift card.");
+        alert("You don’t have enough XP!");
+        return;
+      }
+
+      const newXpBalance = child.xp_balance - giftCard.xp_cost;
+
+      setXpBalance(newXpBalance);
+
+      const { error: updateError } = await supabase
+        .from("children")
+        .update({ xp_balance: newXpBalance })
+        .eq("auth_uid", userId);
+  
+      if (updateError) throw updateError;
+  
+      // 4. Placeholder for actual purchase logic
+      console.log(
+        `Proceeding with purchase of "${giftCard.product_name}" for ${giftCard.xp_cost} XP.`
+      );
+
+      
+      try {
+        const res = await fetch(
+          `/api/bitrefill/purchase-test/?apiKey=${encodeURIComponent(bitRefillAPI)}`
+        );
+    
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error("Test card purchase failed:", errorData);
+          return;
+        }
+    
+        const data = await res.json();
+        console.log("Test Purchase:", data);
+      } catch (err) {
+        console.error("Unexpected error during test card purchase:", err);
+      }
+      
+  
+      // Future: Deduct XP, insert into `purchased_gift_cards`, call Bitrefill, etc.
+  
+    } catch (err) {
+      console.error("Error in handleSpendXp:", err.message);
+    }
+  };
+  
+
 
   if (!family) {
     return (
@@ -207,8 +284,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              <svg
+                className="w-6 h-6 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               </svg>
             </button>
             <Image
@@ -220,22 +307,38 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             />
           </div>
           <div className="flex items-center gap-2 bg-gradient-to-r from-purple-100 to-indigo-100 px-3 py-1 rounded-full">
-            <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <svg
+              className="w-4 h-4 text-purple-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
             </svg>
-            <span className="text-sm font-bold text-purple-700">{xpBalance} XP</span>
+            <span className="text-sm font-bold text-purple-700">
+              {xpBalance} XP
+            </span>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="border-t border-gray-200 bg-white p-4 space-y-4">
             <div className="text-center space-y-2">
-              <h2 className="text-lg font-bold text-gray-800">{family?.family_name}</h2>
+              <h2 className="text-lg font-bold text-gray-800">
+                {family?.family_name}
+              </h2>
               <p className="text-sm text-gray-600">Child Dashboard</p>
             </div>
             <div className="text-center">
-              <p className="text-xs text-gray-500">User ID: {userId.slice(0, 8)}...</p>
+              <p className="text-xs text-gray-500">
+                User ID: {userId.slice(0, 8)}...
+              </p>
             </div>
           </div>
         )}
@@ -268,13 +371,27 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-purple-100 rounded-lg">
-                  <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <svg
+                    className="w-5 h-5 text-purple-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
                   </svg>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-purple-700">Your XP Balance</p>
-                  <p className="text-xl font-bold text-purple-800">{xpBalance} XP</p>
+                  <p className="text-sm font-medium text-purple-700">
+                    Your XP Balance
+                  </p>
+                  <p className="text-xl font-bold text-purple-800">
+                    {xpBalance} XP
+                  </p>
                 </div>
               </div>
             </div>
@@ -282,7 +399,9 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             {/* User Info */}
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs text-gray-500 mb-1">User ID</p>
-              <p className="text-sm font-mono text-gray-700 break-all">{userId}</p>
+              <p className="text-sm font-mono text-gray-700 break-all">
+                {userId}
+              </p>
             </div>
 
             {/* Navigation Tabs */}
@@ -295,8 +414,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
                 }`}
                 onClick={() => setSelectTab("Tasks")}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                  />
                 </svg>
                 <span>Tasks</span>
                 <span className="ml-auto bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded-full">
@@ -311,8 +440,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
                 }`}
                 onClick={() => setSelectTab("Store")}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
                 </svg>
                 <span>Shop</span>
               </button>
@@ -324,8 +463,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
                 onClick={onSignOut}
                 className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl font-medium transition-all duration-200"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
                 </svg>
                 <span>Sign Out</span>
               </button>
@@ -339,24 +488,25 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             {/* Message Display */}
             {message && (
               <div className="mb-6">
-                <MessageBox message={message} onClose={() => setMessage(null)} />
+                <MessageBox
+                  message={message}
+                  onClose={() => setMessage(null)}
+                />
               </div>
             )}
 
             {/* Content */}
             <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
               {selectTab === "Tasks" && (
-                <Tasks 
-                  supabase={supabase} 
-                  familyId={familyId} 
-                  tasks={tasks} 
-                  pendingRequests={pendingRequests} 
-                  handleRequestXp={handleRequestXp} 
+                <Tasks
+                  supabase={supabase}
+                  familyId={familyId}
+                  tasks={tasks}
+                  pendingRequests={pendingRequests}
+                  handleRequestXp={handleRequestXp}
                 />
               )}
-              {selectTab === "Store" && (
-                <Store handleSpendXp={handleSpendXp} />
-              )}
+              {selectTab === "Store" && <Store supabase={supabase} handleSpendXp={handleSpendXp} familyId={familyId} apiKey={bitRefillAPI} />}
             </div>
           </div>
         </div>
@@ -373,8 +523,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             }`}
             onClick={() => setSelectTab("Tasks")}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
             </svg>
             <span className="text-xs font-medium">Tasks</span>
             {tasks.length > 0 && (
@@ -391,8 +551,18 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
             }`}
             onClick={() => setSelectTab("Store")}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+              />
             </svg>
             <span className="text-xs font-medium">Shop</span>
           </button>

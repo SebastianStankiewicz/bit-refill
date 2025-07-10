@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import ProductCard from "./ProductCard";
 
-function Store({ apiKey }) {
+function Store({ supabase, apiKey, familyId }) {
   const [balance, setBalance] = useState(null);
   const [loadingBalance, setLoadingBalance] = useState(true);
   const [loadingProducts, setLoadingProducts] = useState(true);
+  const [giftCards, setGiftCards] = useState([]);
+
 
   const [products, setProducts] = useState([
     {
@@ -59,6 +61,33 @@ function Store({ apiKey }) {
       }
     };
 
+    const fetchFamilyGiftCards = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("family_gift_cards")
+          .select("*")
+          .eq("family_id", familyId)
+          .eq("is_active", true); // Only fetch active cards
+  
+        if (error) throw error;
+        console.log("Gift cards:", data);
+        const mappedProducts = data.map((card) => ({
+          name: card.product_name,
+          usdValue: parseFloat(card.value_in_currency),
+          xpValue: card.xp_cost,
+          enabled: true, // You can add logic later to toggle this based on inventory, etc.
+          imgURL:
+            card.image_url ??
+            "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
+        }));
+    
+        setProducts(mappedProducts);
+      } catch (err) {
+        console.error("Error fetching family gift cards:", err.message);
+      }
+    };
+  
+
     const fetchProducts = async () => {
       setLoadingProducts(true);
       try {
@@ -94,10 +123,8 @@ function Store({ apiKey }) {
       }
     };
     
-  
-    //fetchProducts();
-
     fetchBalance();
+    fetchFamilyGiftCards();
 
     //purchaseTestCard();
   }, [apiKey]);

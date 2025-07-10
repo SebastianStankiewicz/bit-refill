@@ -2,9 +2,10 @@ import React from "react";
 import Image from "next/image";
 
 function ProductCard({ product, handleSpendXp }) {
+
   const handlePurchase = () => {
     if (handleSpendXp) {
-      handleSpendXp(product.xpValue);
+      handleSpendXp(product.id);
     }
   };
 
