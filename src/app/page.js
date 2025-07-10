@@ -25,9 +25,9 @@ export default function Home() {
 
     const init = async () => {
       try {
-        await sdk.actions.ready(); // Wait for SDK to be ready
+        await sdk.actions.ready(); 
         console.log("Farcaster SDK is ready!");
-        // You can now call other SDK methods here
+
       } catch (error) {
         console.error("SDK ready error:", error);
       }
