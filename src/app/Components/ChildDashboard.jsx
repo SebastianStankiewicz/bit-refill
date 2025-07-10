@@ -348,11 +348,6 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
               </h2>
               <p className="text-sm text-gray-600">Child Dashboard</p>
             </div>
-            <div className="text-center">
-              <p className="text-xs text-gray-500">
-                User ID: {userId.slice(0, 8)}...
-              </p>
-            </div>
           </div>
         )}
       </div>
