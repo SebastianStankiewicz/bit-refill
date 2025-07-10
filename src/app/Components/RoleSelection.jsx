@@ -1,16 +1,20 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+
+import { sdk } from "@farcaster/miniapp-sdk";
 
 function RoleSelection({
   userId,
   onSelectRole,
   handleSignInToPreviousAccount,
-  setUserId
+  setUserId,
 }) {
   const [showSignInWindow, setShowSignInWindow] = useState(false);
-  const [userIdToLogin, setUserIdToLogin] = useState("6f79cfbd-36f7-434c-88f6-5c1c9a4ce0f2");
-  
+  const [userIdToLogin, setUserIdToLogin] = useState(
+    "6f79cfbd-36f7-434c-88f6-5c1c9a4ce0f2"
+  );
+
   return (
     <div className="flex min-h-screen items-center justify-center p-4 sm:p-6 md:p-8 bg-gradient-to-br from-gray-50 via-white to-gray-100 font-sans">
       {!showSignInWindow ? (
@@ -27,7 +31,9 @@ function RoleSelection({
             </div>
           </div>
           <div className="space-y-3 sm:space-y-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">FamFill</h1>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
+              FamFill
+            </h1>
             <p className="text-lg sm:text-xl text-gray-600 font-medium leading-relaxed px-2">
               Family XP management made simple.
             </p>
@@ -42,8 +48,18 @@ function RoleSelection({
           >
             <span className="absolute inset-0 bg-gradient-to-r from-[#004540] to-[#002B28] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             <span className="relative flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                />
               </svg>
               Sign in
             </span>
@@ -58,13 +74,17 @@ function RoleSelection({
           </div>
 
           <div className="text-center space-y-2">
-            <p className="text-lg sm:text-xl text-gray-700 font-medium px-2">Get started by choosing your role</p>
-            <p className="text-sm text-gray-500 px-2">Select the option that best describes you</p>
+            <p className="text-lg sm:text-xl text-gray-700 font-medium px-2">
+              Get started by choosing your role
+            </p>
+            <p className="text-sm text-gray-500 px-2">
+              Select the option that best describes you
+            </p>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:gap-4">
             <button
-             onClick={() => onSelectRole('child')}
+              onClick={() => onSelectRole("child")}
               className="group relative px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 text-blue-800 rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-base sm:text-lg font-semibold overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -74,7 +94,7 @@ function RoleSelection({
               </span>
             </button>
             <button
-             onClick={() => onSelectRole('parent')}
+              onClick={() => onSelectRole("parent")}
               className="group relative px-6 sm:px-8 py-5 sm:py-6 bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 text-green-800 rounded-xl shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-base sm:text-lg font-semibold overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-br from-green-100 to-green-200 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
@@ -86,8 +106,12 @@ function RoleSelection({
           </div>
 
           <div className="bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-200">
-            <p className="text-xs sm:text-sm text-gray-500 mb-2 font-medium">Your User ID</p>
-            <p className="font-mono text-xs text-gray-700 break-all bg-white p-2 rounded border">{userId}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mb-2 font-medium">
+              Your User ID
+            </p>
+            <p className="font-mono text-xs text-gray-700 break-all bg-white p-2 rounded border">
+              {userId}
+            </p>
           </div>
         </div>
       ) : (
@@ -95,17 +119,33 @@ function RoleSelection({
           <div className="space-y-3 sm:space-y-4">
             <div className="flex justify-center">
               <div className="p-3 bg-gradient-to-r from-[#002B28] to-[#004540] rounded-full">
-                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <svg
+                  className="w-6 h-6 sm:w-8 sm:h-8 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
                 </svg>
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">Welcome Back</h1>
-            <p className="text-gray-600 px-2">Enter your Auth code to continue</p>
+            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#002B28] to-[#004540] bg-clip-text text-transparent">
+              Welcome Back
+            </h1>
+            <p className="text-gray-600 px-2">
+              Enter your Auth code to continue
+            </p>
           </div>
 
           <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700 text-left">Auth Code</label>
+            <label className="block text-sm font-medium text-gray-700 text-left">
+              Auth Code
+            </label>
             <input
               type="text"
               placeholder="Enter your Auth code"
@@ -122,8 +162,18 @@ function RoleSelection({
             <span className="absolute inset-0 bg-gradient-to-r from-[#004540] to-[#002B28] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
             <span className="relative flex items-center justify-center gap-2">
               Continue
-              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              <svg
+                className="w-4 h-4 sm:w-5 sm:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 7l5 5m0 0l-5 5m5-5H6"
+                />
               </svg>
             </span>
           </button>

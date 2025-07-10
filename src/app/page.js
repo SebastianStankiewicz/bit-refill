@@ -19,21 +19,23 @@ export default function Home() {
   const [userFamilyId, setUserFamilyId] = useState(null); // bigint ID of the family
   const [loadingApp, setLoadingApp] = useState(true);
   const [message, setMessage] = useState(null);
+  const [user, setUser] = useState(null);
+
+  
 
   // --- Supabase Initialization and Auth Listener ---
   useEffect(() => {
 
-    const init = async () => {
-      try {
-        await sdk.actions.ready(); 
-        console.log("Farcaster SDK is ready!");
-
-      } catch (error) {
-        console.error("SDK ready error:", error);
+    (async () => {
+      const res = await sdk.quickAuth.fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`);
+      if (res.ok) {
+        const data = await res.json();
+        alert(data)
+        setUser(data);
       }
-    };
 
-    init();
+      await sdk.actions.ready();
+    })();
     
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
