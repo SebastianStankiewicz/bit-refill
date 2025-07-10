@@ -9,10 +9,11 @@ function RoleSelection({
   onSelectRole,
   handleSignInToPreviousAccount,
   setUserId,
+  farcasterUserData
 }) {
   const [showSignInWindow, setShowSignInWindow] = useState(false);
   const [userIdToLogin, setUserIdToLogin] = useState(
-    "6f79cfbd-36f7-434c-88f6-5c1c9a4ce0f2"
+    farcasterUserData.fid
   );
 
   return (

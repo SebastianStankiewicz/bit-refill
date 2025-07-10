@@ -19,7 +19,7 @@ export default function Home() {
   const [userFamilyId, setUserFamilyId] = useState(null); // bigint ID of the family
   const [loadingApp, setLoadingApp] = useState(true);
   const [message, setMessage] = useState(null);
-  const [user, setUser] = useState(null);
+  const [farcasterUserData, setFarcasterUserData] = useState({fid: "didnt work"});
 
   
 
@@ -30,8 +30,7 @@ export default function Home() {
       const res = await sdk.quickAuth.fetch(`${process.env.NEXT_PUBLIC_API_URL}/me`);
       if (res.ok) {
         const data = await res.json();
-        alert(data)
-        setUser(data);
+        setFarcasterUserData(data);
       }
 
       await sdk.actions.ready();
@@ -309,7 +308,7 @@ export default function Home() {
 
   // Render based on user's state
   if (!userRole) {
-    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} handleSignInToPreviousAccount={handleSignInToPreviousAccount} setUserId={setUserId} />;
+    return <RoleSelection userId={userId} onSelectRole={handleSelectRole} handleSignInToPreviousAccount={handleSignInToPreviousAccount} setUserId={setUserId} farcasterUserData={farcasterUserData}  />;
   } else if (!userFamilyId) {
     return <OnBoarding supabase={supabase} userId={userId} userRole={userRole} onFamilyActionComplete={handleFamilyActionComplete} setUserId={setUserId} />;
   } else if (userRole === 'parent') {
