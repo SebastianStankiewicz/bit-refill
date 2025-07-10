@@ -50,7 +50,47 @@ function Store({ apiKey }) {
       }
     };
 
+    const fetchProducts = async () => {
+      setLoadingProducts(true);
+      try {
+        const res = await fetch(
+          `/api/bitrefill/products?apiKey=${encodeURIComponent(apiKey)}&includeTestProducts=true`
+        );
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        console.log(data);
+      } catch (err) {
+        console.error("Bitrefill products fetch failed:", err);
+      } finally {
+        setLoadingProducts(false);
+      }
+    };
+
+    const purchaseTestCard = async () => {
+      try {
+        const res = await fetch(
+          `/api/bitrefill/purchase-test/?apiKey=${encodeURIComponent(apiKey)}`
+        );
+    
+        if (!res.ok) {
+          const errorData = await res.json();
+          console.error("Test card purchase failed:", errorData);
+          return;
+        }
+    
+        const data = await res.json();
+        console.log("Test Purchase:", data);
+      } catch (err) {
+        console.error("Unexpected error during test card purchase:", err);
+      }
+    };
+    
+  
+    //fetchProducts();
+
     fetchBalance();
+
+    purchaseTestCard();
   }, [apiKey]);
 
   return (
