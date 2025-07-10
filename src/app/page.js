@@ -31,6 +31,9 @@ export default function Home() {
       if (res.ok) {
         const data = await res.json();
         setFarcasterUserData(data);
+        alert("Succes login")
+      } else{
+        alert("failed to login")
       }
 
       await sdk.actions.ready();
