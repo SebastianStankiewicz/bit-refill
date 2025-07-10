@@ -293,7 +293,7 @@ export default function Home() {
         // Clear local state and let the auth listener handle re-signing in anonymously
         setUserRole(null);
         setUserFamilyId(null);
-        setLoadingApp(true); // Set loading to true to re-initiate the flow
+        //setLoadingApp(true); // Set loading to true to re-initiate the flow
         setMessage({ text: "Signed out successfully.", type: "info" });
       } catch (error) {
         console.error("Error signing out:", error.message);
