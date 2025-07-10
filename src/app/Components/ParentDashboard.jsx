@@ -17,11 +17,11 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   //Has been pushed to git so will change after testing and remove hard coding
-  const [bitRefillAPI, setBitRefillAPI] = useState('');
+  const [bitRefillAPI, setBitRefillAPI] = useState(
+    ""
+  );
 
   const [children, setChildren] = useState([]);
-
-
 
   useEffect(() => {
     if (!supabase || !familyId) return;
@@ -46,36 +46,37 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         .from("children")
         .select("*")
         .eq("family_id", familyId);
-  
+
       if (error) {
         console.error("Error fetching children:", error.message);
       } else {
         setChildren(data || []);
       }
     };
-    
 
     const fetchTasks = async () => {
       const { data, error } = await supabase
         .from("tasks")
-        .select(`
+        .select(
+          `
           *,
           xp_requests(status)
-        `)
+        `
+        )
         .eq("family_id", familyId);
-    
+
       if (error) {
         console.error("Error fetching tasks:", error.message);
         return;
       }
-    
+
       // Filter out tasks with an approved XP request
       const filteredTasks = (data || []).filter((task) => {
         // If no xp_requests or none are approved, keep the task
         const requests = task.xp_requests || [];
         return !requests.some((req) => req.status === "approved");
       });
-    
+
       setTasks(filteredTasks);
     };
     fetchFamily();
@@ -98,8 +99,6 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         }
       )
       .subscribe();
-
-    
 
     // Realtime listener for XP requests
     const xpRequestsChannel = supabase
@@ -192,7 +191,6 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
           .eq("auth_uid", childAuthUid); // Update by auth_uid
 
         if (xpUpdateError) throw xpUpdateError;
-      
       }
       setXpRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (error) {
@@ -203,6 +201,40 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
       });
     }
   };
+
+  const handleDeleteTask = async (requestId) => {
+    console.log("Delete task here", requestId);
+  
+    const { data: updateData, error: requestUpdateError } = await supabase
+      .from("xp_requests")
+      .update({
+        status: "approved",
+        processed_at: new Date().toISOString(),
+      })
+      .eq("task_id", requestId)
+      .select(); // select() lets us check if any row was updated
+  
+    if (requestUpdateError) throw requestUpdateError;
+
+    console.log(updateData);
+  
+    // If nothing was updated, insert a new row instead
+    if (!updateData || updateData.length === 0) {
+      const { error: insertError } = await supabase.from("xp_requests").insert({
+        family_id: null,
+        task_id: requestId,
+        child_auth_uid: null,
+        requested_xp: null,
+        status: "approved",
+      });
+  
+      if (insertError) throw insertError;
+    }
+  
+    // Remove from local state
+    setTasks((prevTasks) => prevTasks.filter((task) => task.id !== requestId));
+  };
+  
 
   if (!family) {
     return (
@@ -236,23 +268,41 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
         </div>
-        
+
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
           <div className="mt-4 space-y-2 border-t pt-4">
             <div className="grid grid-cols-2 gap-2 mb-4">
               <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-xs font-medium text-gray-700 mb-1">Family Code</p>
-                <p className="font-mono text-sm text-[#002B28] font-semibold">{family.family_code}</p>
+                <p className="text-xs font-medium text-gray-700 mb-1">
+                  Family Code
+                </p>
+                <p className="font-mono text-sm text-[#002B28] font-semibold">
+                  {family.family_code}
+                </p>
               </div>
               <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-xs font-medium text-gray-700 mb-1">User ID</p>
-                <p className="font-mono text-xs text-gray-600 truncate">{userId.substring(0, 8)}...</p>
+                <p className="text-xs font-medium text-gray-700 mb-1">
+                  User ID
+                </p>
+                <p className="font-mono text-xs text-gray-600 truncate">
+                  {userId.substring(0, 8)}...
+                </p>
               </div>
             </div>
             <button
@@ -283,16 +333,24 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
             </h1>
             <p className="text-sm text-gray-600">Parent Dashboard</p>
           </div>
-          
+
           <div className="space-y-4">
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 mb-1">Family Code</p>
-              <p className="font-mono text-[#002B28] font-semibold">{family.family_code}</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Family Code
+              </p>
+              <p className="font-mono text-[#002B28] font-semibold">
+                {family.family_code}
+              </p>
             </div>
-            
+
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-sm font-medium text-gray-700 mb-1">Your User ID</p>
-              <p className="font-mono text-xs text-gray-600 break-all">{userId}</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Your User ID
+              </p>
+              <p className="font-mono text-xs text-gray-600 break-all">
+                {userId}
+              </p>
             </div>
           </div>
 
@@ -343,9 +401,21 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
             {selectTab === "Store" ? (
               <Store apiKey={bitRefillAPI} />
             ) : selectTab === "Tasks" ? (
-              <Tasks supabase={supabase} familyId={familyId} childrenNames={children} tasks={tasks} setTasks={setTasks} />
+              <Tasks
+                supabase={supabase}
+                familyId={familyId}
+                childrenNames={children}
+                tasks={tasks}
+                setTasks={setTasks}
+                handleDeleteTask={handleDeleteTask}
+              />
             ) : selectTab === "Pending" ? (
-              <Pending xpRequests={xpRequests} childrenNames={childrenNames} tasks={tasks} handleUpdateXpRequest={handleUpdateXpRequest} />
+              <Pending
+                xpRequests={xpRequests}
+                childrenNames={childrenNames}
+                tasks={tasks}
+                handleUpdateXpRequest={handleUpdateXpRequest}
+              />
             ) : null}
           </div>
         </div>

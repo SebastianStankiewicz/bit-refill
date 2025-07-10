@@ -11,10 +11,18 @@ function Store({ apiKey }) {
 
   const [products, setProducts] = useState([
     {
+      name: "Test Gift Card",
+      usdValue: 0,
+      xpValue: 200,
+      enabled: true,
+      imgURL:
+        "https://cdn.bitrefill.com/primg/w720h432/bitrefill-giftcard-usd.webp",
+    },
+    {
       name: "Roblox",
       usdValue: 5,
       xpValue: 100,
-      enabled: true,
+      enabled: false,
       imgURL:
         "https://cdn.bitrefill.com/primg/w720h432/roblox-united-kingdom.webp",
     },
@@ -22,10 +30,11 @@ function Store({ apiKey }) {
       name: "Roblox",
       usdValue: 10,
       xpValue: 200,
-      enabled: true,
+      enabled: false,
       imgURL:
         "https://cdn.bitrefill.com/primg/w720h432/roblox-united-kingdom.webp",
-    },
+    }
+
   ]);
 
   useEffect(() => {

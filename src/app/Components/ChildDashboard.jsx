@@ -34,12 +34,29 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
     const fetchTasks = async (userId) => {
       const { data, error } = await supabase
         .from("tasks")
-        .select("*")
+        .select(
+          `
+          *,
+          xp_requests(status)
+        `
+        )
         .eq("family_id", familyId)
-        .eq("assigned_child_uid", userId);;
-      if (error) console.error("Error fetching tasks:", error.message);
-      else setTasks(data || []);
+        .eq("assigned_child_uid", userId); // Only tasks for the current user
+    
+      if (error) {
+        console.error("Error fetching tasks:", error.message);
+        return;
+      }
+    
+      // Filter out tasks with an approved XP request
+      const filteredTasks = (data || []).filter((task) => {
+        const requests = task.xp_requests || [];
+        return !requests.some((req) => req.status === "approved");
+      });
+    
+      setTasks(filteredTasks);
     };
+    
 
     fetchTasks(userId);
     fetchFamily();
@@ -165,66 +182,10 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
           family_id: familyId,
         },
       ]);
-      
-      setMessage({
-        text: `XP request for "${task.description}" submitted!`,
-        type: "info",
-      });
+     
     } catch (error) {
       console.error("Error requesting XP:", error.message);
-      setMessage({
-        text: "Failed to submit XP request. " + error.message,
-        type: "error",
-      });
-    }
-  };
-
-  const handleSpendXp = async () => {
-    if (xpBalance < 100) {
-      // Example threshold for spending
-      setMessage({
-        text: "You need at least 100 XP to redeem a gift card.",
-        type: "error",
-      });
-      return;
-    }
-
-    setMessage({ text: "Redeeming gift card...", type: "info" });
-    try {
-      // --- MOCK Bitrefill API Call (Next.js API Route) ---
-      const response = await fetch("/api/mock-bitrefill-redeem", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, xpToRedeem: 100 }), // Example: redeem 100 XP
-      });
-      const result = await response.json();
-
-      if (result.success) {
-        // Deduct XP from balance in the children table
-        const { error: xpUpdateError } = await supabase
-          .from("children")
-          .update({ xp_balance: xpBalance - 100 })
-          .eq("auth_uid", userId); // Update by auth_uid
-
-        if (xpUpdateError) throw xpUpdateError;
-        setMessage({
-          text: `Gift card redeemed successfully! Remaining XP: ${
-            xpBalance - 100
-          }`,
-          type: "info",
-        });
-      } else {
-        setMessage({
-          text: `Gift card redemption failed: ${result.message}`,
-          type: "error",
-        });
-      }
-    } catch (error) {
-      console.error("Error spending XP:", error.message);
-      setMessage({
-        text: "Failed to redeem gift card. " + error.message,
-        type: "error",
-      });
+      
     }
   };
 
