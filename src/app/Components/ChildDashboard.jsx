@@ -13,9 +13,7 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
   const [selectTab, setSelectTab] = useState("Tasks");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const [bitRefillAPI, setBitRefillAPI] = useState(
-    "zerAK5-I3eFm_FH5dV1N2awVsJBgLXNR1O9Ge8qfl4U"
-  );
+  const [bitRefillAPI, setBitRefillAPI] = useState("");
 
   useEffect(() => {
     if (!supabase || !familyId) return;
@@ -31,6 +29,7 @@ function ChildDashboard({ supabase, userId, familyId, onSignOut }) {
         console.error("Error fetching family:", error.message);
         setFamily(null);
       } else {
+        setBitRefillAPI(data.bitrefill_api_key);
         setFamily(data);
       }
     };

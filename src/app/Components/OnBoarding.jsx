@@ -22,6 +22,12 @@ function OnBoarding({
       setMessage({ text: "Please enter a family name.", type: "error" });
       return;
     }
+
+    if (!bitRefillAPI.trim()) {
+      setMessage({ text: "Please enter a Bitrefill API key.", type: "error" });
+      return;
+    }
+
     const familyCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // Simple random code
 
     try {
@@ -58,6 +64,7 @@ function OnBoarding({
           family_name: familyName.trim(),
           family_code: familyCode,
           parent_auth_uid: userId, // Store parent's auth_uid here
+          bitrefill_api_key: bitRefillAPI.trim()
         })
         .select("id") // Select the inserted row to get its ID
         .single();

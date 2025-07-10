@@ -16,10 +16,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
   const [selectTab, setSelectTab] = useState("Pending");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  //Has been pushed to git so will change after testing and remove hard coding
-  const [bitRefillAPI, setBitRefillAPI] = useState(
-    "zerAK5-I3eFm_FH5dV1N2awVsJBgLXNR1O9Ge8qfl4U"
-  );
+  const [bitRefillAPI, setBitRefillAPI] = useState("");
 
   const [children, setChildren] = useState([]);
 
@@ -37,6 +34,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         console.error("Error fetching family:", error.message);
         setFamily(null);
       } else {
+        setBitRefillAPI(data.bitrefill_api_key);
         setFamily(data);
       }
     };
@@ -204,7 +202,7 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
 
   const handleDeleteTask = async (requestId) => {
     console.log("Delete task here", requestId);
-  
+
     const { data: updateData, error: requestUpdateError } = await supabase
       .from("xp_requests")
       .update({
@@ -213,11 +211,11 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
       })
       .eq("task_id", requestId)
       .select(); // select() lets us check if any row was updated
-  
+
     if (requestUpdateError) throw requestUpdateError;
 
     console.log(updateData);
-  
+
     // If nothing was updated, insert a new row instead
     if (!updateData || updateData.length === 0) {
       const { error: insertError } = await supabase.from("xp_requests").insert({
@@ -227,14 +225,13 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         requested_xp: null,
         status: "approved",
       });
-  
+
       if (insertError) throw insertError;
     }
-  
+
     // Remove from local state
     setTasks((prevTasks) => prevTasks.filter((task) => task.id !== requestId));
   };
-  
 
   if (!family) {
     return (
@@ -399,7 +396,11 @@ function ParentDashboard({ supabase, userId, familyId, onSignOut }) {
         <div className="flex-1 p-4 lg:p-8">
           <div className="bg-white rounded-xl shadow-lg p-4 lg:p-6 min-h-full">
             {selectTab === "Store" ? (
-              <Store supabase={supabase} apiKey={bitRefillAPI} familyId={familyId} />
+              <Store
+                supabase={supabase}
+                apiKey={bitRefillAPI}
+                familyId={familyId}
+              />
             ) : selectTab === "Tasks" ? (
               <Tasks
                 supabase={supabase}
