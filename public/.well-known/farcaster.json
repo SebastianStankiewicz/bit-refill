@@ -9,7 +9,7 @@
       "splashBackgroundColor": "#3B82F6",
       "webhookUrl": "https://bit-refill-hackathon1.vercel.app/api/webhook",
       "description": "FamFi is a Farcaster mini-app that helps parents reward their kids with real gift cards for completing chores.",
-      "subtitle": "Teaching financial responsibility through fun, XP-based incentives powerd via Bitrefill",
+      "subtitle": "Powerd via Bitrefill",
       "primaryCategory": "finance"
     },
     "accountAssociation": {
