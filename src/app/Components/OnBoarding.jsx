@@ -49,7 +49,7 @@ function OnBoarding({
           .from("parents")
           .insert({
             auth_uid: userId,
-            name: "Parent " + userId.substring(0, 6),
+            name: "Parent " + userId,
           }) // Placeholder name
           .select("id")
           .single();
