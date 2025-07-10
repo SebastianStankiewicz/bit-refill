@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 
-function Tasks({ supabase, familyId, childrenNames, tasks, setTasks, handleDeleteTask }) {
+function Tasks({
+  supabase,
+  familyId,
+  childrenNames,
+  tasks,
+  setTasks,
+  handleDeleteTask,
+}) {
   const [newTaskDescription, setNewTaskDescription] = useState(""); // Changed from name to description
   const [newTaskXp, setNewTaskXp] = useState(10);
   const [selectedChildUid, setChildUid] = useState("");
   const [message, setMessage] = useState(null);
-
- 
 
   const handleAddTask = async () => {
     if (!newTaskDescription.trim() || newTaskXp <= 0) {
@@ -206,40 +211,47 @@ function Tasks({ supabase, familyId, childrenNames, tasks, setTasks, handleDelet
             </div>
           ) : (
             <div className="grid gap-4">
-  {tasks.map((task) => (
-    <div
-      key={task.id}
-      className="p-6 bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-200 hover:border-[#002B28]/30 transition-all duration-300 hover:shadow-md"
-    >
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center"> {/* Changed this line */}
-        <div className="flex-1 mb-4 sm:mb-0"> {/* Added margin-bottom for stacking */}
-          <h3 className="font-semibold text-gray-800 text-lg mb-1">
-            {task.description}
-          </h3>
-          {task.assigned_child_uid && (
-            <p className="text-sm text-gray-500">
-              Assigned to:{" "}
-              {childrenNames.find(
-                (child) => child.auth_uid === task.assigned_child_uid
-              )?.name || "Unknown"}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-2 flex-shrink-0"> {/* Added flex-shrink-0 */}
-          <div className="bg-gradient-to-r from-[#002B28] to-[#004540] text-white px-4 py-2 rounded-full font-semibold">
-            {task.xp_value} XP
-          </div>
-          <button
-            className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-sm hover:brightness-110 hover:scale-105 transition-all duration-200"
-            onClick={() => handleDeleteTask(task.id)}
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
-  ))}
-</div>
+              {tasks.map((task) => (
+                <div
+                  key={task.id}
+                  className="p-6 bg-gradient-to-r from-white to-gray-50 rounded-xl border border-gray-200 hover:border-[#002B28]/30 transition-all duration-300 hover:shadow-md"
+                >
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
+                    {" "}
+                    {/* Changed this line */}
+                    <div className="flex-1 mb-4 sm:mb-0">
+                      {" "}
+                      {/* Added margin-bottom for stacking */}
+                      <h3 className="font-semibold text-gray-800 text-lg mb-1">
+                        {task.description}
+                      </h3>
+                      {task.assigned_child_uid && (
+                        <p className="text-sm text-gray-500">
+                          Assigned to:{" "}
+                          {childrenNames.find(
+                            (child) =>
+                              child.auth_uid === task.assigned_child_uid
+                          )?.name || "Unknown"}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {" "}
+                      {/* Added flex-shrink-0 */}
+                      <div className="bg-gradient-to-r from-[#002B28] to-[#004540] text-white px-4 py-2 rounded-full font-semibold">
+                        {task.xp_value} XP
+                      </div>
+                      <button
+                        className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-sm hover:brightness-110 hover:scale-105 transition-all duration-200"
+                        onClick={() => handleDeleteTask(task.id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

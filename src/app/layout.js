@@ -19,6 +19,21 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" data-theme="cupcake">
+      <meta
+        name="fc:miniapp"
+        content='{
+          "version": "1",
+          "imageUrl": "https://media.discordapp.net/attachments/535551463187808309/1392905256337276949/image.png?ex=68713b9c&is=686fea1c&hm=93849b99ac66f89ccc5ba16f1a2791ba0b85d9f3274bcdf622d7d56285024378&=&format=webp&quality=lossless&width=1652&height=1652",
+          "button": {
+            "title": "Launch FamFi",
+            "action": {
+              "type": "launch_miniapp",
+              "name": "FamFi"
+            }
+          }
+        }
+        '
+      />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
