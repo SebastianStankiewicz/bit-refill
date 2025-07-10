@@ -1,20 +1,21 @@
 {
-    "frame": {
-      "name": "FamFi",
-      "version": "1",
-      "iconUrl": "https://bit-refill-hackathon1.vercel.app/icon.png",
-      "homeUrl": "https://bit-refill-hackathon1.vercel.app",
-      "imageUrl": "https://bit-refill-hackathon1.vercel.app/image.png",
-      "splashImageUrl": "https://bit-refill-hackathon1.vercel.app/splash.png",
-      "splashBackgroundColor": "#3B82F6",
-      "webhookUrl": "https://bit-refill-hackathon1.vercel.app/api/webhook",
-      "description": "FamFi is a Farcaster mini-app that helps parents reward their kids with real gift cards for completing chores.",
-      "subtitle": "Powerd via Bitrefill",
-      "primaryCategory": "finance"
-    },
-    "accountAssociation": {
-      "header": "eyJmaWQiOjExMTY0NzMsInR5cGUiOiJhdXRoIiwia2V5IjoiMHgyMTc3MjE3RjYyMzY4YUNkQjNDMDlBZDFmY0ZFRTk2N2Q3MThGNDYyIn0",
-      "payload": "eyJkb21haW4iOiJiaXQtcmVmaWxsLWhhY2thdGhvbjEudmVyY2VsLmFwcCJ9",
-      "signature": "iFgJ4xf6LaYWf5ygTxJyPyWv83ltPnq0rejS2wjo4VJV+IZeN+9+MJx4C0aXao/SqsHxXhkQGiRJ0wpm+BY4Ixw="
-    }
+  "frame": {
+    "name": "FamFi",
+    "version": "1",
+    "iconUrl": "https://bit-refill-hackathon1.vercel.app/icon.png",
+    "homeUrl": "https://bit-refill-hackathon1.vercel.app",
+    "imageUrl": "https://bit-refill-hackathon1.vercel.app/image.png",
+    "splashImageUrl": "https://bit-refill-hackathon1.vercel.app/splash.png",
+    "splashBackgroundColor": "#3B82F6",
+    "webhookUrl": "https://bit-refill-hackathon1.vercel.app/api/webhook",
+    "description": "FamFi is a Farcaster mini-app that helps parents reward their kids with real gift cards for completing chores.",
+    "subtitle": "Powerd via Bitrefill",
+    "primaryCategory": "finance"
+  },
+
+  "accountAssociation": {
+    "header": "eyJmaWQiOjExMTY0NzMsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg1YkYzZTU1ZUExNmQ2NGRBOGEyQzhGNUFGRTlmNWY5YjA0MTI0ODg5In0",
+    "payload": "eyJkb21haW4iOiJiaXQtcmVmaWxsLWhhY2thdGhvbjEudmVyY2VsLmFwcCJ9",
+    "signature": "MHg2MzZmYzFkNGE0MDc1ZWQzZjdiYmE4ZjUzYmY2Yjg4MTJjY2NhNmIyM2M3Yjk1MDMwM2Y0Nzk3MDY2YmFiZjBjNWRhMGQ5OTQ0NTc2ODgyODZiMzA3MzVjZDkyN2VjZDYyNDJjNmE4ZTUwZmM0NWExOTIyNmE2NTNjZTYzYTE2MDFi"
   }
+}
